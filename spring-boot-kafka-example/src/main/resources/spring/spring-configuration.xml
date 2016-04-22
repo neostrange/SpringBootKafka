@@ -31,17 +31,33 @@
 
 
 
-	<bean id="kafkaStringSerializer"
-		class="org.apache.kafka.common.serialization.StringSerializer">
-		
+	<bean id="kafkaStringSerializer" class="org.apache.kafka.common.serialization.StringSerializer">
 	</bean>
 
-	<int-kafka:producer-context id="kafkaProducerContext">
+
+	<bean id="voteEncoder"
+		class="org.springframework.integration.kafka.serializer.avro.AvroReflectDatumBackedKafkaEncoder">
+		<constructor-arg value="com.example.Vote" />
+	</bean>
+
+
+	<bean id="producerProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="topic.metadata.refresh.interval.ms">3600000</prop>
+				<prop key="message.send.max.retries">5</prop>
+				<prop key="send.buffer.bytes">5242880</prop>
+			</props>
+		</property>
+	</bean>
+
+	<int-kafka:producer-context id="kafkaProducerContext" producer-properties="producerProperties">
 		<int-kafka:producer-configurations>
 			<int-kafka:producer-configuration
 				broker-list="localhost:9092" topic="${topic}" key-class-type="java.lang.String"
-				key-serializer="kafkaStringSerializer" value-class-type="java.lang.String"
-				value-serializer="kafkaStringSerializer" />
+				key-serializer="kafkaStringSerializer" value-class-type="com.example.Vote"
+				value-encoder="voteEncoder" />
 		</int-kafka:producer-configurations>
 	</int-kafka:producer-context>
 
