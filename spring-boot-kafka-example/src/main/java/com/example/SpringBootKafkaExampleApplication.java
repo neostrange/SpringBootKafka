@@ -34,11 +34,10 @@ public class SpringBootKafkaExampleApplication {
 	@RequestMapping("/vote")
 	public Status vote(@RequestBody Vote vote) throws ExecutionException, InterruptedException {
 
+		
 		Message<Vote> message = MessageBuilder.withPayload(vote)
 				.setHeader("Topic", "votes").build();
 		inputToKafka.send(message);
-		
-		
 		
 		return new Status("ok");
 	}

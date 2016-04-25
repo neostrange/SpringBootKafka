@@ -26,7 +26,7 @@
 			receive-timeout="0" task-executor="taskExecutor" />
 	</int-kafka:outbound-channel-adapter>
 
-	<task:executor id="taskExecutor" pool-size="5"
+	<task:executor id="taskExecutor" pool-size="1"
 		keep-alive="120" queue-capacity="500" />
 
 
