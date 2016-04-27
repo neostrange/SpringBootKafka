@@ -52,10 +52,11 @@
 		</property>
 	</bean>
 
+
 	<int-kafka:producer-context id="kafkaProducerContext" producer-properties="producerProperties">
 		<int-kafka:producer-configurations>
 			<int-kafka:producer-configuration
-				broker-list="localhost:9092" topic="${topic}" key-class-type="java.lang.String"
+				broker-list="${brokerList}" topic="${topic}" key-class-type="java.lang.String"
 				key-serializer="kafkaStringSerializer" value-class-type="com.example.Vote"
 				value-encoder="voteEncoder" />
 		</int-kafka:producer-configurations>
