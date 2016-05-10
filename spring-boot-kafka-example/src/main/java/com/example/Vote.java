@@ -1,7 +1,7 @@
 package com.example;
 
 
-public class Vote {
+public class Vote implements Ipojo{
     private String name;
  
     public Vote(String name) {

@@ -35,7 +35,7 @@
 	</bean>
 
 
-	<bean id="voteEncoder"
+	<bean id="pojoEncoder"
 		class="org.springframework.integration.kafka.serializer.avro.AvroReflectDatumBackedKafkaEncoder">
 		<constructor-arg value="com.example.Vote" />
 	</bean>
@@ -57,8 +57,8 @@
 		<int-kafka:producer-configurations>
 			<int-kafka:producer-configuration
 				broker-list="${brokerList}" topic="${topic}" key-class-type="java.lang.String"
-				key-serializer="kafkaStringSerializer" value-class-type="com.example.Vote"
-				value-encoder="voteEncoder" />
+				key-serializer="kafkaStringSerializer" value-class-type="java.lang.Object"
+				value-encoder="pojoEncoder" />
 		</int-kafka:producer-configurations>
 	</int-kafka:producer-context>
 

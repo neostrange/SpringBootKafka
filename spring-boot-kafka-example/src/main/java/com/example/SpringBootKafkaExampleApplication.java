@@ -41,6 +41,17 @@ public class SpringBootKafkaExampleApplication {
 		
 		return new Status("ok");
 	}
+	
+	@RequestMapping("/voter")
+	public Status vote(@RequestBody Voter voter) throws ExecutionException, InterruptedException {
+
+		
+		Message<Voter> message = MessageBuilder.withPayload(voter)
+				.setHeader("Topic", "votes").build();
+		inputToKafka.send(message);
+		
+		return new Status("ok");
+	}
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(SpringBootKafkaExampleApplication.class, args);
