@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-kafka="http://www.springframework.org/schema/integration/kafka"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xsi:schemaLocation="http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka.xsd
+		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-4.2.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+
+
+	<context:property-placeholder location="classpath:/application.properties" />
+	<context:component-scan base-package="com.example" />
+
+	<int-file:inbound-channel-adapter
+		directory="/home/neo/Downloads/Incidents_Dataset/" filename-pattern="*formatted.json" id="filesIn"
+		channel="toSplitter"  auto-startup="true">
+		<int:poller fixed-delay="5000"  />
+	</int-file:inbound-channel-adapter>
+
+	<int:splitter input-channel="toSplitter" output-channel="inputToKafka"
+		ref="fileSplitter" method="split" />
+
+	<bean id="fileSplitter" class="com.example.FileSplitter" />
+
+	<int:channel id="inputToKafka">
+		<int:queue />
+	</int:channel>
+
+	<int-kafka:outbound-channel-adapter
+		id="kafkaOutboundChannelAdapter" kafka-producer-context-ref="kafkaProducerContext"
+		channel="inputToKafka">
+		<int:poller fixed-delay="1000" time-unit="MILLISECONDS"
+			receive-timeout="0" task-executor="taskExecutor" />
+	</int-kafka:outbound-channel-adapter>
+
+	<task:executor id="taskExecutor" pool-size="1"
+		keep-alive="120" queue-capacity="500" />
+
+
+
+	<bean id="kafkaStringSerializer" class="org.apache.kafka.common.serialization.StringSerializer">
+	</bean>
+
+
+<!-- 	<bean id="pojoEncoder" -->
+<!-- 		class="org.springframework.integration.kafka.serializer.avro.AvroReflectDatumBackedKafkaEncoder"> -->
+<!-- 		<constructor-arg value="com.example.Vote" /> -->
+<!-- 	</bean> -->
+
+
+	<bean id="producerProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="topic.metadata.refresh.interval.ms">3600000</prop>
+				<prop key="message.send.max.retries">5</prop>
+				<prop key="send.buffer.bytes">5242880</prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<int-kafka:producer-context id="kafkaProducerContext"
+		producer-properties="producerProperties">
+		<int-kafka:producer-configurations>
+			<int-kafka:producer-configuration
+				broker-list="${brokerList}" topic="${topic}" key-class-type="java.lang.String"
+				key-serializer="kafkaStringSerializer" value-class-type="java.lang.String"
+				value-serializer="kafkaStringSerializer" />
+		</int-kafka:producer-configurations>
+	</int-kafka:producer-context>
+
+
+
+</beans>

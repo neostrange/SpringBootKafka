@@ -25,7 +25,7 @@ import org.testng.remote.strprotocol.GenericMessage;
 @SpringBootApplication
 @EnableAutoConfiguration
 @RestController
-@ImportResource("classpath:/spring/spring-configuration.xml")
+@ImportResource("classpath:/spring/spring-configuration-json-reader.xml")
 public class SpringBootKafkaExampleApplication {
 
 	@Autowired
