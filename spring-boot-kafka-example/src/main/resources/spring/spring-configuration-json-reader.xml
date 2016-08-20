@@ -17,9 +17,9 @@
 	<context:component-scan base-package="com.example" />
 
 	<int-file:inbound-channel-adapter
-		directory="/home/neo/Downloads/Incidents_Dataset/" filename-pattern="*formatted.json" id="filesIn"
-		channel="toSplitter"  auto-startup="true">
-		<int:poller fixed-delay="5000"  />
+		directory="/home/needle/Downloads/" filename-pattern="cuckoo*.json"
+		id="filesIn" channel="toSplitter" auto-startup="true">
+		<int:poller fixed-delay="500" />
 	</int-file:inbound-channel-adapter>
 
 	<int:splitter input-channel="toSplitter" output-channel="inputToKafka"
@@ -47,10 +47,10 @@
 	</bean>
 
 
-<!-- 	<bean id="pojoEncoder" -->
-<!-- 		class="org.springframework.integration.kafka.serializer.avro.AvroReflectDatumBackedKafkaEncoder"> -->
-<!-- 		<constructor-arg value="com.example.Vote" /> -->
-<!-- 	</bean> -->
+	<!-- <bean id="pojoEncoder" -->
+	<!-- class="org.springframework.integration.kafka.serializer.avro.AvroReflectDatumBackedKafkaEncoder"> -->
+	<!-- <constructor-arg value="com.example.Vote" /> -->
+	<!-- </bean> -->
 
 
 	<bean id="producerProperties"
@@ -60,6 +60,8 @@
 				<prop key="topic.metadata.refresh.interval.ms">3600000</prop>
 				<prop key="message.send.max.retries">5</prop>
 				<prop key="send.buffer.bytes">5242880</prop>
+				<prop key="max.request.size">100000000</prop>
+
 			</props>
 		</property>
 	</bean>
